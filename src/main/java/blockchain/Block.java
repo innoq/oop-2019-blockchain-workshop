@@ -1,0 +1,243 @@
+package blockchain;
+
+import java.nio.ByteBuffer;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+/*
+    Block structure:
+    --------------------------------------------------------------------------------------
+    |Block number|prevHash|hash|nonce|timestamp|difficulty|noTransactions|transactions...|
+    --------------------------------------------------------------------------------------
+
+    Size in bytes:
+    ---------------------
+    |8|32|32|8|8|2|2|360|
+    ---------------------
+
+    Block structure for proof of work:
+    ---------------------------------------------------------------------------------
+    |Block number|prevHash|nonce|timestamp|difficulty|noTransactions|transactions...|
+    ---------------------------------------------------------------------------------
+    Size in bytes:
+    -------------------------
+    |8|32|8|8|2|2|(0-5) * 72|
+    -------------------------
+*/
+
+public class Block {
+
+    private long blockNumber;
+    private Instant timestamp;
+
+    private byte[] prevHash = new byte[32];
+    private byte[] hash = new byte[32];
+
+    private short difficulty;
+    private long nonce;
+
+    private short noTransactions;
+    private List<Transaction> transactions;
+
+    private transient boolean stop;
+
+    public Block(long blockNumber, byte[] prevHash, short difficulty) {
+        this.blockNumber = blockNumber;
+        this.prevHash = prevHash;
+        this.hash = new byte[32];
+        this.nonce = 0;
+        this.timestamp = Instant.ofEpochMilli(Instant.now().toEpochMilli());
+        this.difficulty = difficulty;
+        this.noTransactions = 0;
+        this.transactions = new ArrayList<>(Utils.MAX_TRANSACTIONS_PER_BLOCK);
+    }
+
+    public Block(long blockNumber, byte[] prevHash, short difficulty, Transaction... transactions) {
+        this.blockNumber = blockNumber;
+        this.prevHash = prevHash;
+        this.hash = new byte[32];
+        this.nonce = 0;
+        this.timestamp = Instant.ofEpochMilli(Instant.now().toEpochMilli());
+        this.difficulty = difficulty;
+        this.noTransactions = 0;
+        this.transactions = new ArrayList<>(Utils.MAX_TRANSACTIONS_PER_BLOCK);
+        for (Transaction t : transactions) {
+            addTransaction(t);
+        }
+
+    }
+
+    public Block(byte[] block) {
+        if (block.length != Utils.BLOCKSIZE) {
+            throw new IllegalArgumentException();
+        }
+        ByteBuffer b = ByteBuffer.wrap(block);
+        blockNumber = b.getLong();
+        b.get(prevHash, 0, 32);
+        b.get(hash, 0, 32);
+        nonce = b.getLong();
+        timestamp = Instant.ofEpochMilli(b.getLong());
+        difficulty = b.getShort();
+        noTransactions = 0;
+        short numberOfTransactions = b.getShort();
+        transactions = new ArrayList<>(numberOfTransactions);
+        for (short i = 0; i < numberOfTransactions; i++) {
+            byte[] t = new byte[Transaction.TRANSACTION_SIZE];
+            b.get(t);
+            addTransaction(new Transaction(t));
+        }
+    }
+
+    public void addTransaction(Transaction t) {
+        if (transactions.size() + 1 > Utils.MAX_TRANSACTIONS_PER_BLOCK) {
+            throw new IllegalArgumentException(
+                    "Block can't have more than "  + Utils.MAX_TRANSACTIONS_PER_BLOCK + " transactions");
+        }
+        transactions.add(t);
+        noTransactions++;
+    }
+
+    /* Begin your code ------------------------------------------------------ */
+
+    public boolean validate() {
+        /*
+        Schreibe eine Methode zur Validierung des Blockes.
+
+        Die Methode sollte true zurückliefern wenn der Hash des Byte-Arrays von:
+        ---------------------------------------------------------------------------------
+        |Block number|prevHash|nonce|timestamp|difficulty|noTransactions|transactions...|
+        ---------------------------------------------------------------------------------
+        die passende Anzahl (difficulty) führender Nullen hat, ansonsten false.
+
+        */
+        throw new RuntimeException("Not implemented yet");
+    }
+
+    /* End your code ------------------------------------------------------ */
+
+    public void stopMining() {
+        stop = true;
+    }
+
+    public byte[] toByteArray() {
+        ByteBuffer b = ByteBuffer.allocate(Utils.BLOCKSIZE);
+        b.putLong(blockNumber);
+        b.put(prevHash);
+        b.put(hash);
+        b.putLong(nonce);
+        b.putLong(timestamp.toEpochMilli());
+        b.putShort(difficulty);
+        b.putShort(noTransactions);
+        if (noTransactions != transactions.size()) {
+            throw new IllegalStateException();
+        }
+        for (Transaction t : transactions) {
+            b.put(t.toByteArray());
+        }
+        return b.array();
+    }
+
+    public long getBlockNumber() {
+        return blockNumber;
+    }
+
+    public void setBlockNumber(long blockNumber) {
+        this.blockNumber = blockNumber;
+    }
+
+    public Instant getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Instant timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public byte[] getPrevHash() {
+        return prevHash;
+    }
+
+    public void setPrevHash(byte[] prevHash) {
+        this.prevHash = prevHash;
+    }
+
+    public byte[] getHash() {
+        return hash;
+    }
+
+    public void setHash(byte[] hash) {
+        this.hash = hash;
+    }
+
+    public short getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(short difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public long getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(long nonce) {
+        this.nonce = nonce;
+    }
+
+    public short getNoTransactions() {
+        return noTransactions;
+    }
+
+    public void setNoTransactions(short noTransactions) {
+        this.noTransactions = noTransactions;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Block block = (Block) o;
+        return getBlockNumber() == block.getBlockNumber() &&
+                nonce == block.nonce &&
+                difficulty == block.difficulty &&
+                noTransactions == block.noTransactions &&
+                Arrays.equals(getPrevHash(), block.getPrevHash()) &&
+                Arrays.equals(getHash(), block.getHash()) &&
+                Objects.equals(timestamp, block.timestamp) &&
+                Arrays.equals(transactions.toArray(new Transaction[0]), block.transactions.toArray(new Transaction[0]));
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(getBlockNumber(), nonce, timestamp, difficulty, noTransactions, transactions);
+        result = 31 * result + Arrays.hashCode(getPrevHash());
+        result = 31 * result + Arrays.hashCode(getHash());
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Block{" +
+                "blockNumber=" + blockNumber +
+                ", prevHash=" + Utils.bytesToHexString(prevHash) +
+                ", hash=" + Utils.bytesToHexString(hash) +
+                ", nonce=" + nonce +
+                ", timestamp=" + timestamp +
+                ", difficulty=" + difficulty +
+                ", noTransactions=" + noTransactions +
+                ", transactions=" + transactions +
+                '}';
+    }
+}
