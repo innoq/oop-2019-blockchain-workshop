@@ -33,7 +33,7 @@ public class Chain {
 
     public void addBlock(Block block) {
         /*
-        Schreibe eine Methode die eine validen Block an die Chain anhängt.
+        Schreibe eine Methode, die einen validen Block an die Chain anhängt.
 
         Die Kette muss dabei auch valide bleiben und alle Transaktionen im
         neu angehängten Block müssen ausführbar sein.
