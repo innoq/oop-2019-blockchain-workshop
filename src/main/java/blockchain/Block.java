@@ -144,9 +144,9 @@ public class Block {
 
     public void mine() {
         /*
-        Schreibe eine Methode die das richtige nonce berechnet damit der Block korrekt validiert.
+        Schreibe eine Methode, die das richtige NONCE berechnet, damit der Block korrekt validiert.
 
-        BONUS: Stoppe die Berechnung when das Feld stop true ist.
+        BONUS: Stoppe die Berechnung, wenn das Feld stop true ist.
          */
         throw new RuntimeException("Not implemented yet");
     }
