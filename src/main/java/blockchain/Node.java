@@ -47,13 +47,13 @@ public class Node implements Runnable {
 
     public boolean receiveChain(byte[] chainBlob) {
         /*
-        Schreibe eine Methode die eine Chain von einem anderen Knoten entgegen
+        Schreibe eine Methode, die eine Chain von einem anderen Knoten entgegen
         nimmt.
 
         Sollte diese valide und länger sein als die aktuelle Chain des Knotens
-        tausche die aktuelle Chain gegen die des anderen Kontens.
+        tausche die aktuelle Chain gegen die des anderen Knotens.
 
-        Wenn die Chain ausgetauscht wurde gebe true zurück, ansonsten false.
+        Wenn die Chain ausgetauscht wurde, gebe true zurück, ansonsten false.
          */
         throw new RuntimeException("Not implemented yet");
     }
