@@ -44,8 +44,8 @@ public class Node implements Runnable {
     public void run() {
 
         /*
-        Schreibe eine Methode die solange neue Blöcke mined bis die Länge
-        der Chain Utils.MAX_CHAIN_LENGTH ist oder stop true ist.
+        Schreibe eine Methode, die solange neue Blöcke mined bis die Länge
+        der Chain Utils.MAX_CHAIN_LENGTH erreicht oder stop true ist.
          */
         throw new RuntimeException("Not implemented yet");
     }
@@ -53,8 +53,8 @@ public class Node implements Runnable {
     public void broadcastChain() {
 
         /*
-        Schreibe eine Methode die die Chain des Nodes an alle peer nodes
-        verteilt sobald ein neuer Block gefunden wurde.
+        Schreibe eine Methode, die die Chain dieses nodes an alle peer nodes
+        verteilt, sobald ein neuer Block gefunden wurde.
 
         TIPP: Zum Verteilen rufe die Methode receiveChain auf den
         peer nodes auf.
@@ -66,7 +66,7 @@ public class Node implements Runnable {
 
         /*
         Erweitere die Methode so, dass das Mining gestoppt wird,
-        wenn Länge der getauschet Chain Utils.MAX_CHAIN_LENGTH ist.
+        wenn die Länge der getauschten Chain Utils.MAX_CHAIN_LENGTH ist.
          */
 
         Chain receivedChain = null;
